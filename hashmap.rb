@@ -75,11 +75,23 @@ class HashMap
     keychain
   end
 
-  def values
+  def values(arr = @buckets, lockbox = [])
+    return if arr.first.nil?
 
+    lockbox.push(arr[1])
+    arr.each do |bucket|
+      values(bucket, lockbox) if bucket.is_a?(Array)
+    end
+    lockbox
   end
 
-  def entries
+  def entries(arr = @buckets, log = [])
+    return if arr.first.nil?
 
+    log.push([arr.first, arr[1]])
+    arr.each do |bucket|
+      entries(bucket, log) if bucket.is_a?(Array)
+    end
+    log
   end
 end
