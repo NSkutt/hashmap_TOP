@@ -65,8 +65,14 @@ class HashMap
     @buckets = Array.new(16)
   end
 
-  def keys
+  def keys(arr = @buckets, keychain = [])
+    return if arr.first.nil?
 
+    keychain.push(arr.first)
+    arr.each do |bucket|
+      keys(bucket, keychain) if bucket.is_a?(Array)
+    end
+    keychain
   end
 
   def values
