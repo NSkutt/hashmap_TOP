@@ -11,8 +11,8 @@ class HashMap
 
   def growth_check
     if hash.length >= @load_factor * @buckets.length
-      @buckets += Array.new(@buckets.length)
 
+      @buckets += Array.new(@buckets.length)
     end
   end
 
@@ -24,7 +24,7 @@ class HashMap
     hash_code = 0
     prime_num = 31
     str.each_char { |char| prime_num * hash_code += char.ord }
-    hash_code % @buckets.length
+    hash_code %= @buckets.length
     error_check(hash_code)
     hash_code
   end
@@ -61,7 +61,7 @@ class HashMap
   end
 
   def clear
-    @buckets.each { |bucket| bucket = nil}
+    @buckets.map! { |bucket| bucket = nil}
     @buckets = Array.new(16)
   end
 
