@@ -10,11 +10,14 @@ class HashMap
   end
 
   def growth_check
-    if hash.length >= @load_factor * @buckets.length
+    return unless keys.length >= @load_factor * @buckets.length
 
-      @buckets += Array.new(@buckets.length)
-    end
+    temp_array = entries
+    @buckets += Array.new(@buckets.length)
+    temp_array.each_slice(2) { |kv| set(kv.first, kv[1]) }
   end
+
+  def bucket_check; p @buckets; end
 
   def error_check(index)
     raise IndexError if index.negative? || index >= @buckets.length
@@ -29,10 +32,10 @@ class HashMap
     hash_code
   end
 
-  def set(k, val)
-    idx = hash(k)
+  def set(key, val)
+    idx = hash(key)
 
-    @buckets[idx] = [k, val, @buckets[idx]]
+    @buckets[idx] = [key, val, @buckets[idx]]
     growth_check
   end
 
@@ -56,7 +59,7 @@ class HashMap
 
   def length
     filled_buckets = 0
-    @buckets.for_each { |bucket| bucket.nil? ? next : filled_buckets += 1 }
+    @buckets.each { |bucket| bucket.nil? ? next : filled_buckets += 1 }
     filled_buckets
   end
 
@@ -66,9 +69,7 @@ class HashMap
   end
 
   def keys(arr = @buckets, keychain = [])
-    return if arr.first.nil?
-
-    keychain.push(arr.first)
+    keychain.push(arr.first) unless arr.first.nil?
     arr.each do |bucket|
       keys(bucket, keychain) if bucket.is_a?(Array)
     end
@@ -76,9 +77,7 @@ class HashMap
   end
 
   def values(arr = @buckets, lockbox = [])
-    return if arr.first.nil?
-
-    lockbox.push(arr[1])
+    lockbox.push(arr[1]) unless arr.first.nil?
     arr.each do |bucket|
       values(bucket, lockbox) if bucket.is_a?(Array)
     end
@@ -86,9 +85,7 @@ class HashMap
   end
 
   def entries(arr = @buckets, log = [])
-    return if arr.first.nil?
-
-    log.push([arr.first, arr[1]])
+    log.push([arr.first, arr[1]]) unless arr.first.nil?
     arr.each do |bucket|
       entries(bucket, log) if bucket.is_a?(Array)
     end
