@@ -13,8 +13,9 @@ class HashMap
     return unless keys.length >= @load_factor * @buckets.length
 
     temp_array = entries
-    @buckets += Array.new(@buckets.length)
-    temp_array.each_slice(2) { |kv| set(kv.first, kv[1]) }
+    @buckets = Array.new(@buckets.length * 2)
+
+    temp_array.each { |kv| set(kv.first, kv[1]) }
   end
 
   def bucket_check; p @buckets; end
@@ -48,6 +49,8 @@ class HashMap
   def key?(key)
     idx = hash(key)
     error_check(idx)
+    return false if @buckets[idx].nil?
+
     @buckets[idx].flatten.include?(key)
   end
 
