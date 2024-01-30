@@ -20,44 +20,46 @@ class HashMap
 
   def bucket_check; p @buckets; end
 
-  def error_check(index)
+  def checkout(key)
+    index = hash(key)
     raise IndexError if index.negative? || index >= @buckets.length
+
+    index
   end
 
   def hash(str)
     hash_code = 0
     prime_num = 31
     str.each_char { |char| prime_num * hash_code += char.ord }
-    hash_code %= @buckets.length
-    error_check(hash_code)
-    hash_code
+    index = hash_code % @buckets.length
+    raise IndexError if index.negative? || index >= @buckets.length
+
+    index
   end
 
   def set(key, val)
-    idx = hash(key)
-
+    idx = checkout(key)
     @buckets[idx] = [key, val, @buckets[idx]]
     growth_check
   end
 
   def get(key)
-    idx = hash(key)
-    error_check(idx)
+    idx = checkout(key)
     @buckets[idx][1]
   end
 
   def key?(key)
-    idx = hash(key)
-    error_check(idx)
+    idx = checkout(key)
     return false if @buckets[idx].nil?
 
     @buckets[idx].flatten.include?(key)
   end
 
   def remove(key)
-    idx = hash(key)
-    error_check(idx)
-    key?(key) ? @buckets.delete_at(idx) : nil
+    idx = checkout(key)
+    nil unless key?(key)
+
+
   end
 
   def length
@@ -67,7 +69,7 @@ class HashMap
   end
 
   def clear
-    @buckets.map! { |bucket| bucket = nil}
+    @buckets.map! { nil }
     @buckets = Array.new(16)
   end
 
