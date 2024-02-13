@@ -18,7 +18,7 @@ class HashMap
     temp_array.each { |kv| set(kv.first, kv[1]) }
   end
 
-  def bucket_check; p @buckets; end
+  def bucket_check; @buckets; end
 
   def checkout(key)
     index = hash(key)
@@ -65,21 +65,20 @@ class HashMap
     bucket = @buckets[hash(key)]
     return nil unless bucket.is_a?(Array)
 
-    holding_array = Marshal.load(Marshal.dump(bucket))
     clean_array = exterminate(key, bucket)
-    subtracted_items = holding_array - clean_array
-    subtracted_items.flatten!(1) if subtracted_items.first.is_a?(Array)
-    subtracted_items.reject { |item| item.is_a?(Array) }
+    @buckets[hash(key)] = bucket.empty? ? nil : bucket
+    clean_array
   end
 
-  def exterminate(key, bucket)
-    bucket.each { |item| exterminate(key, item) if item.is_a?(Array) }
+  def exterminate(key, bucket, removed_items = nil)
+    bucket.each { |item| removed_items = exterminate(key, item, removed_items) if item.is_a?(Array) }
     bucket.reject!(&:empty?)
-    return bucket unless bucket.first == key
+    return removed_items unless bucket.first == key
 
+    removed_items = bucket.reject { |item| item.is_a?(Array) }
     bucket.select! { |item| item.is_a?(Array) }
     bucket.flatten!(1)
-    bucket
+    removed_items
   end
 
   def length
