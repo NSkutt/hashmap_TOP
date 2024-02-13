@@ -44,9 +44,21 @@ class HashMap
 
   def set(key, val)
     idx = checkout(key)
-    @buckets[idx] = [key, val, @buckets[idx]]
+    @buckets[idx] = if key?(key)
+                      reassign(key, val, @buckets[idx])
+                    else
+                      [key, val, @buckets[idx]]
+                    end
     compactor(idx)
     growth_check
+  end
+
+  def reassign(key, val, old_bucket)
+    old_bucket.each do |arr|
+      reassign(key, val, old_bucket) if arr.is_a?(Array)
+
+      old_bucket.replace([key, val]) if old_bucket.first == key
+    end
   end
 
   def get(key)
